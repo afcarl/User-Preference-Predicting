@@ -3,6 +3,7 @@ from SogouParser import ParseSogou
 import jieba
 from Package.extract_url import *
 from Package.extract_vertical import *
+from Package.extract_text import *
 
 class Feature():
 	url_features = []
@@ -22,11 +23,11 @@ class Feature():
 					delta.append(feature_a[i]-feature_b[i])
 				return delta
 
-	def featuresExtractor(self,baidu,sogou): # baidu & sogou is a list of lists
-		self.query_features = queryExtractor(baidu,sogou)
-		self.url_features = urlExtractor(baidu,sogou)
-		self.text_features = textExtractor(baidu,sogou)
-		self.vertical_features = verticalExtractor(baidu,sogou)
+	def featuresExtractor(self,baidu,sogou,query_type): # baidu & sogou is a list of lists
+		self.query_features = self.queryExtractor(baidu,sogou,query_type)
+		self.url_features = self.urlExtractor(baidu,sogou)
+		self.text_features = self.textExtractor(baidu,sogou)
+		self.vertical_features = self.verticalExtractor(baidu,sogou)
 
 
 	def urlExtractor(self,baidu,sogou):
@@ -57,6 +58,7 @@ class Feature():
 			vertical_feature_delta = self.Delta(vertical_feature_baidu,vertical_feature_sogou)  # calculating delta
 			vertical_features.append(vertical_feature_baidu+vertical_feature_sogou+vertical_feature_delta)
 		return vertical_features
+
 	def number(self,gene):
 		count = 0
 		for item in gene:
@@ -75,8 +77,21 @@ class Feature():
 			word_length = self.number(seg_list)
 			print query.encode("utf8")+"\t" + str(char_length) + "\t" + str(word_length) + "\t" + q_type
 			query_features.append([char_length,word_length,q_type])
+		return query_features
 
-
+	def textExtractor(self,baidu,sogou):
+		num = len(baidu)
+		text_features = []
+		text_parser = text()
+		for i in range(num):
+			baidu_page = baidu[i]
+			sogou_page = sogou[i]
+			text_feature_baidu = text_parser.textCal(baidu_page)
+			text_features_sogou = text_parser.textCal(sogou_page)
+			text_features_delta = self.Delta(text_feature_baidu,text_features_sogou)
+			text_features.append(text_feature_baidu+text_features_sogou+text_features_delta)
+		#print len(text_features[0])
+		return text_features  # dimension 54?
 
 
 baidu_parser = ParseBaidu()
@@ -86,9 +101,15 @@ baidu_lists = baidu_parser.getResults(1,4,10,"../codes/Feature/Files/query_id.tx
 sogou_lists = sogou_parser.getResults(1,4,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
 
 feature_calculator = Feature()
+feature_calculator.featuresExtractor(baidu_lists,sogou_lists,"./query.txt")
+text_features = feature_calculator.text_features
+query_features = feature_calculator.query_features
+vertical_features = feature_calculator.vertical_features
 #url_features = feature_calculator.urlExtractor(baidu_lists,sogou_lists)
 #vertical_features = feature_calculator.verticalExtractor(baidu_lists,sogou_lists)
-query_features = feature_calculator.queryExtractor(baidu_lists,sogou_lists,"./query.txt")
+#query_features = feature_calculator.queryExtractor(baidu_lists,sogou_lists,"./query.txt")
+#text_features = feature_calculator.textExtractor(baidu_lists,sogou_lists)
+#print text_features
 
 '''for i in range(len(baidu_lists)):
 	baidu =  baidu_lists[i]
