@@ -21,3 +21,20 @@ SearchResult 中包含的变量有
 qid: query号
 vertical： int类型，记录当前结果是否是垂直搜索
 figure：Int类型，记录当前结果是否包含图片
+
+
+### Extractor
+
+featureExtractor.py 是核心代码，定义了一个类 Feature，希望能返回所有的特征。但是首先分为了 aspect，再看第几条结果。恩，应该说是特征类型有限的分类。
+
+特征的类别：
+（1）URL：Jaccard&Kendall’s tau （不区分baidu,sogou)
+（2）vertical : v_first(第一次出现veritical位置的倒数），v_num (出现veritcal结果的数量），f_first, f_num 含义类似，知识把veritcal换成了图片 （区分Baidu,Sogou, 和差值Delta)
+（3）Query: Type, 长度分为 汉字数量和 利用Jieba分词后的词语数量
+需要输入文件 query_type:
+文件格式：
+query+”\t”+query_type
+需要人工标注
+
+（4）Text : 
+（5）

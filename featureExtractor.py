@@ -1,7 +1,8 @@
 from BaiduParser import ParseBaidu
 from SogouParser import ParseSogou
 import jieba
-from extract_url import url
+from Package.extract_url import *
+from Package.extract_vertical import *
 
 class Feature():
 	url_features = []
@@ -9,6 +10,17 @@ class Feature():
 	vertical_features = []
 	query_features = []
 	diversity_features = []
+
+	def Delta(self,feature_a,feature_b):
+			delta = []
+			numa = len(feature_a)
+			numb = len(feature_b)
+			if numa != numb:
+				print "Bug in Calculating Delta"
+			else:
+				for i in range(numa):
+					delta.append(feature_a[i]-feature_b[i])
+				return delta
 
 	def featuresExtractor(self,baidu,sogou): # baidu & sogou is a list of lists
 		self.query_features = queryExtractor(baidu,sogou)
@@ -28,16 +40,41 @@ class Feature():
 			doc_num_sogou = len(sogou)
 			Jaccard = url_parser.urlJaccard(baidu_page,sogou_page) ## Calculating Jaccard
 			tau = url_parser.Kendall(baidu_page,sogou_page)			## Calculating Kendall's tau
-			print str(Jaccard) + "\	t" + str(tau)
+			print str(Jaccard) + "\t" + str(tau)
 			url_feature = [Jaccard, tau]
 			url_features.append(url_feature)
 		return url_features
 
-	
+	def verticalExtractor(self,baidu,sogou):
+		num = len(baidu)
+		vertical_features = []
+		vertical_parser = vertical()
+		for i in range(num):
+			baidu_page = baidu[i]
+			sogou_page = sogou[i]
+			vertical_feature_baidu = vertical_parser.verticalCal(baidu_page) + vertical_parser.figureCal(baidu_page) # codes locates at "./Package/extract_veritcal"
+			vertical_feature_sogou = vertical_parser.verticalCal(sogou_page) + vertical_parser.figureCal(sogou_page)
+			vertical_feature_delta = self.Delta(vertical_feature_baidu,vertical_feature_sogou)  # calculating delta
+			vertical_features.append(vertical_feature_baidu+vertical_feature_sogou+vertical_feature_delta)
+		return vertical_features
+	def number(self,gene):
+		count = 0
+		for item in gene:
+			count += 1
+		return count
 
-#	def queryDict(query_id, query_type):
-#	def queryExtractor(self,baidu,sogou):
-
+	def queryExtractor(self,baidu,sogou,query_type):
+		lines = open(query_type,"r").readlines()
+		query_features = []
+		for line in lines:
+			query = line.split("\t")[0].replace(".html","")
+			q_type = line.split("\t")[1].strip()
+			query = unicode(query,"utf8")
+			char_length = len(query)  ### There still some problem in this one , for number & zimu
+			seg_list = jieba.cut(query,cut_all=False)
+			word_length = self.number(seg_list)
+			print query.encode("utf8")+"\t" + str(char_length) + "\t" + str(word_length) + "\t" + q_type
+			query_features.append([char_length,word_length,q_type])
 
 
 
@@ -49,9 +86,9 @@ baidu_lists = baidu_parser.getResults(1,4,10,"../codes/Feature/Files/query_id.tx
 sogou_lists = sogou_parser.getResults(1,4,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
 
 feature_calculator = Feature()
-url_features = feature_calculator.urlExtractor(baidu_lists,sogou_lists)
-
-
+#url_features = feature_calculator.urlExtractor(baidu_lists,sogou_lists)
+#vertical_features = feature_calculator.verticalExtractor(baidu_lists,sogou_lists)
+query_features = feature_calculator.queryExtractor(baidu_lists,sogou_lists,"./query.txt")
 
 '''for i in range(len(baidu_lists)):
 	baidu =  baidu_lists[i]
