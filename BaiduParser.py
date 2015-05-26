@@ -85,12 +85,11 @@ class ParseBaidu:
 					result = SearchResult(i,query,count,title.get_text().rstrip().lstrip(),snippet,url,vertical,figure)
 					Results.append(result)
 
-					print "save successfully"
 
 				except:
 					count = count - 1
-					print "sth is wrong"
-					traceback.print_exc()
+					#print "sth is wrong"
+					#traceback.print_exc()
 				if count > windows:
 					print "Windows Ends"
 					break

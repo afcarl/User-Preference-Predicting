@@ -41,7 +41,7 @@ class ParseSogou:
 		for i in range(start_a,end_b): # the range of query
 			#file_path = "../Sogou/"+queries[i]
 			file_path = page_folder_path+queries[i]
-			query = queries[i]
+			query = queries[i].replace(".html","")
 			Results = []
 			count = 0
 			p = Parser()
@@ -67,7 +67,7 @@ class ParseSogou:
 				Results.append(result)
 				if count > windows:
 					break
-			print query
+			#print query
 
 			result_list.append(Results)
 
