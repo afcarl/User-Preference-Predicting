@@ -41,6 +41,7 @@ class ParseSogou:
 		for i in range(start_a,end_b): # the range of query
 			#file_path = "../Sogou/"+queries[i]
 			file_path = page_folder_path+queries[i]
+			#print file_path
 			query = queries[i].replace(".html","")
 			Results = []
 			count = 0
@@ -75,7 +76,10 @@ class ParseSogou:
 
 if __name__=='__main__':
 	l = ParseSogou()
-	resultlist  = l.getResults(1,3,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
+	resultlist  = l.getResults(1,301,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
 	for Result in resultlist:
-		for item in Result:
-			item.Print()
+		if len(Result)==0:
+			print resultlist.index(Result)
+			print Result[0]
+		#for item in Result:
+		#	item.Print()

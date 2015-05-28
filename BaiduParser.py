@@ -49,7 +49,7 @@ class ParseBaidu:
 		for i in range(start_a,end_b):
 			#file_path = "../Baidu/"+queries[i]
 			file_path = page_folder_path+queries[i]
-			print file_path
+			#print file_path
 			query = queries[i]
 			soup = BeautifulSoup(open(file_path,"r").read())
 			query = query.replace(".html","")
@@ -91,7 +91,7 @@ class ParseBaidu:
 					#print "sth is wrong"
 					#traceback.print_exc()
 				if count > windows:
-					print "Windows Ends"
+					#print "Windows Ends"
 					break
 			result_list.append(Results)
 		return result_list

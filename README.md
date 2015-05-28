@@ -41,7 +41,7 @@ figure：Int类型，记录当前结果是否包含图片
 #####（4）Text: for now 有54个features, 从三个角度来看：Sogou, Baidu, Delta. 18又分为 avg, min, max  6个又被分为 snippet,title  3个又被分为 coverage, similarity & length
 #####（5）
 
-#### 我们这里的 
+#### 调用的信息可以如下代码
 ``` python
 feature_calculator = Feature()
 feature_calculator.featuresExtractor(baidu_lists,sogou_lists,"./query.txt")
@@ -49,5 +49,19 @@ text_features = feature_calculator.text_features
 query_features = feature_calculator.query_features
 vertical_features = feature_calculator.vertical_features
 ```
-注意到 featureExtractor的的三个参数，***baidu_list***为搜索结果的SearchResult对象 list 的 list ; 同 ***Sogou_list*** 
+注意到 featureExtractor的的三个参数，***baidu_list***为搜索结果的SearchResult对象 list 的 list ; 同 ***Sogou_list*** ;
 ./query.txt 是标注query信息的file 
+
+
+### Predictor
+
+这部分本来只需要一个文件，但是发现每次都提取一次所有feature的效率太低下了。于是决定分成两个部分，一个是**Write2file**, 另一个是 **Learning/predicting.py**。
+
+write2file.py 将创建两个读取html的对象，解析baidu&sogou文件
+之后利用Feature类的函数抓取出不同aspect的特征，存到文件中去。
+
+predicting, 这一部分主要是得到 ** X& y**
+X 通过文件得到
+y 也是通过文件（标注结果），但是这里设计了一个函数获取不同标准的ground truth。
+
+最后用学习算法计算metrics.

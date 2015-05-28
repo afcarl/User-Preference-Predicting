@@ -25,7 +25,9 @@ class text:
 		Max = 0.0
 		Min =999
 		AVG = 0.0
+		query = ""
 		for item in Results:
+			query = item.query
 			if domain == "title":
 				score = self.Coverage(item.title, item.query)
 			else:
@@ -35,7 +37,11 @@ class text:
 			if score > Max:
 				Max = score
 			AVG += score
-		AVG = AVG/float(len(Results))
+		if len(Results)==0:
+			AVG =0.0
+			#print "result is empty " + query+"\t"+domain
+		else:
+			AVG = AVG/float(len(Results))
 		return [Min,Max,AVG]	
 
 	def SimilarityFeature(self,Results, domain):
@@ -53,7 +59,11 @@ class text:
 			if score > Max:
 				Max = score
 			AVG += score
-		AVG = AVG/float(len(Results))
+		if len(Results)==0:
+			AVG =0.0
+			#print "result is empty " + domain
+		else:
+			AVG = AVG/float(len(Results))
 		return [Min,Max,AVG]	
 
 	def Length(self,Results, domain):
@@ -70,7 +80,11 @@ class text:
 			if length > Max:
 				Max = length
 			AVG += length
-		AVG = AVG/float(len(Results))
+		if len(Results)==0:
+			AVG =0.0
+			#print "result is empty " + domain
+		else:
+			AVG = AVG/float(len(Results))
 		return [Min,Max,AVG]
 
 	def textCal(self,Results):
