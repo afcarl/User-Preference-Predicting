@@ -11,7 +11,7 @@ class Feature():
 	vertical_features = []
 	query_features = []
 	diversity_features = []
-	lenght = 0
+	length = 0
 
 	def Delta(self,feature_a,feature_b):
 			delta = []
@@ -54,9 +54,10 @@ class Feature():
 		for i in range(num):
 			baidu_page = baidu[i]
 			sogou_page = sogou[i]
-			vertical_feature_baidu = vertical_parser.verticalCal(baidu_page) + vertical_parser.figureCal(baidu_page) # codes locates at "./Package/extract_veritcal"
+			vertical_feature_baidu = vertical_parser.verticalCal(baidu_page) + vertical_parser.figureCal(baidu_page) + vertical_parser.categoryCal(baidu_page) # codes locates at "./Package/extract_veritcal"
 			vertical_feature_sogou = vertical_parser.verticalCal(sogou_page) + vertical_parser.figureCal(sogou_page)
 			vertical_feature_delta = self.Delta(vertical_feature_baidu,vertical_feature_sogou)  # calculating delta
+			#vertical_feature_delta = []
 			vertical_features.append(vertical_feature_baidu+vertical_feature_sogou+vertical_feature_delta)
 		return vertical_features
 
@@ -98,7 +99,10 @@ class Feature():
 			text_feature_baidu = text_parser.textCal(baidu_page)
 			text_features_sogou = text_parser.textCal(sogou_page)
 			text_features_delta = self.Delta(text_feature_baidu,text_features_sogou)
-			text_features.append(text_feature_baidu+text_features_sogou+text_features_delta)
+			text_features_comparison = [text_parser.text_comparison(baidu_page,sogou_page,i) for i in range(1,10)]
+			#print text_features_comparison
+
+			text_features.append(text_feature_baidu+text_features_sogou+text_features_delta+text_features_comparison)
 		#print len(text_features[0])
 		return text_features  # dimension 54?
 
@@ -107,25 +111,14 @@ if __name__ == "__main__":
 	baidu_parser = ParseBaidu()
 	sogou_parser = ParseSogou()
 
-	baidu_lists = baidu_parser.getResults(1,301,4,"../codes/Feature/Files/query_id.txt","../codes/Feature/Baidu/")
-	sogou_lists = sogou_parser.getResults(1,301,4,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
+	baidu_lists = baidu_parser.getResults(11,12,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Baidu/")
+	sogou_lists = sogou_parser.getResults(11,12,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
 
 	feature_calculator = Feature()
 	feature_calculator.featuresExtractor(baidu_lists,sogou_lists,"./query.txt")
 	text_features = feature_calculator.text_features
 	query_features = feature_calculator.query_features
 	vertical_features = feature_calculator.vertical_features
+	print vertical_features[0]
 	url_features= feature_calculator.url_features
 	# text_delta_features = 
-
-#url_features = feature_calculator.urlExtractor(baidu_lists,sogou_lists)
-#vertical_features = feature_calculator.verticalExtractor(baidu_lists,sogou_lists)
-#query_features = feature_calculator.queryExtractor(baidu_lists,sogou_lists,"./query.txt")
-#text_features = feature_calculator.textExtractor(baidu_lists,sogou_lists)
-#print text_features
-
-'''for i in range(len(baidu_lists)):
-	baidu =  baidu_lists[i]
-	sogou = sogou_lists[i]
-	if baidu[0].query != sogou[0].query:
-		print baidu[0].query+"\t" +sogou[0].query'''

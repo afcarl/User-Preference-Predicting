@@ -11,14 +11,22 @@ class text:
 		return score
 
 	def Similarity(self,text,query): # calculating similarity between text & query
-		query = unicode(query,'utf8')
+		try:
+			query = unicode(query,'utf8')
+		except:
+			query = query
 		q_l = len(query)
-		q_t = len(text)
+		t_l = len(text)
 		count = 0
-		for char in query:
-			if char in text:
-				count += 1
-		score = float(count)/(float(q_l)+float(q_t)-float(count))
+		if q_l < t_l:
+			for char in query:
+				if char in text:
+					count += 1
+		else:
+			for char in text:
+				if char in query:
+					count += 1
+		score = float(count)/(float(q_l)+float(t_l)-float(count))
 		return score
 
 	def CoverageFeature(self,Results, domain):
@@ -96,5 +104,13 @@ class text:
 		s_similarity = self.SimilarityFeature(Results,"snippet")
 		return t_length+s_length+t_coverage+s_coverage+t_similarity+s_similarity
 
+	def text_comparison(self,r1,r2,windows):  # r1 & r2 is for a page with 10 docs
+		text1 = ""
+		text2 = ""
+		windows = min(len(r1),len(r2),windows)
+		for i in range(windows):
+			text1 += r1[i].title+r1[i].snippet
+			text2 += r2[i].title+r1[i].snippet
+		return self.Similarity(text1,text2)
 
 
