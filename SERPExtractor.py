@@ -61,6 +61,7 @@ class Slot:
 		self.showedURL = ''
 		self.showedTime = ''
 		self.figure= ''
+		self.vertical_dictionary = {}
 
 
 class Parser:
@@ -133,6 +134,7 @@ class Parser:
 			rtr.foot = self.parseFoot(node)
 			rtr.othertext = self.parseOtherText(node)
 			rtr.figure  = self.parseFigure(node)
+			rtr.vertical_dictionary = self.parseVeritcalCategory(node,rtr.mainurl)
 
 		if tp == 'rb':
 			rtr.title,rtr.mainurl,rtr.resulttype,rtr.rank = self.parseTitle(node)
@@ -140,7 +142,7 @@ class Parser:
 			rtr.foot = self.parseFoot(node)
 			rtr.othertext = self.parseOtherText(node)
 			rtr.figure  = self.parseFigure(node)
-
+			rtr.vertical_dictionary = self.parseVeritcalCategory(node,rtr.mainurl)
 
 		return rtr
 
@@ -184,6 +186,35 @@ class Parser:
 			return rtr
 
 		return text
+	def parseVeritcalCategory(self,node,url):
+		vertical_dictionary = {}
+		category_name = ["encyclopedia","download","video","stock","news","forum","experience","reading","gps_map"]
+		for item in category_name: # initialization
+			vertical_dictionary[item] = 0
+		if "baike" in url:
+			vertical_dictionary["encyclopedia"]=1
+
+		#for item in node.find_all('div'):
+		nodes = node.find_all('div') + node.find_all('a')
+		for item in nodes:
+			if 'id' in item.attrs:
+				if 'sogou_vr_10000801' in item['id']:
+					vertical_dictionary["gps_map"] =1 
+				if "sogou_vr_30002300" in item['id'] or "sogou_vr_30001903" in item['id'] or "sogou_vr_700" in item['id']:
+					vertical_dictionary["download"] = 1
+				if "sogou_vr_30001403" in item['id'] or 'sogou_vr_21' in item['id']:
+					vertical_dictionary["video"] = 1
+				if "sogou_vr_30000901" in item['id'] or "sogou_vr_30000401" in item['id'] or "sogou_vr_30000402" in item['id']:
+					vertical_dictionary["forum"] = 1 
+				if "sogou_vr_30002003" in item['id'] or "sogou_vr_30000201" in item['id'] or "sogou_vr_30000201" in item['id'] or "sogou_vr_30010052" in item['id']:#wenwen or zhidao
+					vertical_dictionary["forum"] = 1 
+				if "sogou_vr_30000501" in item['id'] or "sogou_vr_11002501" in item['id']:
+					vertical_dictionary["news"] = 1
+				if "sogou_vr_300801" in item['id']:
+					vertical_dictionary["reading"] = 1
+
+
+		return vertical_dictionary
 
 	def parseSERP(self, filename):
 		soup = BeautifulSoup(open(filename).read())

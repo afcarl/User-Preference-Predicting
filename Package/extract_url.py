@@ -17,6 +17,8 @@ class url:
 		count = 0
 		l_baidu = len(baidu)
 		l_sogou = len(sogou)
+		if l_baidu==0 or l_sogou==0:
+			return 0 
 		for i in range(l_baidu):
 			for j in range(l_sogou):
 				flag = self.urlSimilar(self.cleanurl(baidu[i].url),self.cleanurl(sogou[j].url))
@@ -33,6 +35,8 @@ class url:
 		count = 0
 		l_baidu = len(baidu)
 		l_sogou = len(sogou)
+		if l_baidu==0 or l_sogou==0:
+			return 0 
 		similar_list = []
 		for i in range(l_baidu):
 			for j in range(l_sogou):
@@ -46,7 +50,11 @@ class url:
 				if similar_list[i]<similar_list[j]:
 					count += 1
 		#print len(similar_list)
-		tau = float(count)*2/float(l_baidu*(l_baidu-1))
+		try:
+			tau = float(count)*2/float(l_baidu*(l_baidu-1))
+		except:
+			tau = float(count)
+
 		return tau
 
 

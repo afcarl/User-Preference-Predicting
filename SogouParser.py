@@ -11,8 +11,20 @@ class SearchResult:
 	Similarity = 0.0
 	figure = 0
 	rank = 0
+
+	## vertical specific category
+	vertical_category = {}
+	encyclopedia = 0
+	download = 0
+	video = 0
+	stock = 0 
+	news = 0
+	forum = 0
+	experience = 0
+	reading = 0
+	gps_map = 0
 	
-	def __init__(self,qid, query, rank, title,snippet, url, vertical,figure):
+	def __init__(self,qid, query, rank, title,snippet, url, vertical,figure,vertical_dictionary):
 		self.qid = qid
 		self.query = query
 		self.rank = rank
@@ -21,9 +33,64 @@ class SearchResult:
 		self.url = url
 		self.vertical = vertical
 		self.figure = figure
+		self.update_vertical_dictionary(vertical_dictionary)
+
+	def update_vertical_dictionary(self,vertical_dictionary):
+		category = ["encyclopedia","download","video","stock","news","forum","experience","reading","gps_map"]
+		if vertical_dictionary['encyclopedia'] == 1:
+			self.encyclopedia = 1
+			vertical = 1
+		else:
+			encyclopedia = 0
+		if vertical_dictionary['download'] == 1:
+			self.download = 1
+			vertical = 1
+		else:
+			download = 0
+		if vertical_dictionary['video'] == 1:
+			self.video = 1
+			vertical = 1
+		else:
+			video = 0
+		if vertical_dictionary['stock'] == 1:
+			self.stock = 1
+			vertical = 1
+		else:
+			stock = 0
+		if vertical_dictionary['news'] == 1:
+			self.news = 1
+			vertical = 1
+		else:
+			news = 0
+		if vertical_dictionary['forum'] == 1:
+			self.forum= 1
+			vertical = 1
+		else:
+			forum = 0
+		if vertical_dictionary['experience'] == 1:
+			self.experience = 1
+			vertical = 1
+		else:
+			experience= 0
+		if vertical_dictionary['reading'] == 1:
+			self.reading = 1
+			vertical = 1
+		else:
+			reading= 0	
+		if vertical_dictionary['gps_map'] == 1:
+			self.gps_map = 1
+			vertical = 1
+		else:
+			gps_map= 0
 
 	def Print(self):
 		print str(self.qid)+"\t" + self.query + "\t"+ str(self.rank) + "\t" + self.title + "\t figure? " + str(self.figure) 
+	
+	def output_category(self):
+		category_name = ["encyclopedia","download","video","stock","news","forum","experience","reading","gps_map"]
+		for i in range(len(category_name)):
+			print category_name[i]+": "+str(eval(str("self.")+str(category_name[i])))+",",
+		print "\n"
 
 class ParseSogou:
 
@@ -43,6 +110,7 @@ class ParseSogou:
 			file_path = page_folder_path+queries[i]
 			#print file_path
 			query = queries[i].replace(".html","")
+			print "Sogou " + query
 			Results = []
 			count = 0
 			p = Parser()
@@ -64,7 +132,7 @@ class ParseSogou:
 				else:
 					snippet = item.summary
 
-				result = SearchResult(i,query,count,title,snippet,url,vertical,item.figure)
+				result = SearchResult(i,query,count,title,snippet,url,vertical,item.figure,item.vertical_dictionary)
 				Results.append(result)
 				if count > windows:
 					break
@@ -76,10 +144,10 @@ class ParseSogou:
 
 if __name__=='__main__':
 	l = ParseSogou()
-	resultlist  = l.getResults(1,301,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
+	resultlist  = l.getResults(11,12,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
 	for Result in resultlist:
-		if len(Result)==0:
-			print resultlist.index(Result)
-			print Result[0]
+		for item in Result:
+			item.Print()
+			item.output_category()
 		#for item in Result:
 		#	item.Print()

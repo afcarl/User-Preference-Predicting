@@ -55,7 +55,7 @@ class Feature():
 			baidu_page = baidu[i]
 			sogou_page = sogou[i]
 			vertical_feature_baidu = vertical_parser.verticalCal(baidu_page) + vertical_parser.figureCal(baidu_page) + vertical_parser.categoryCal(baidu_page) # codes locates at "./Package/extract_veritcal"
-			vertical_feature_sogou = vertical_parser.verticalCal(sogou_page) + vertical_parser.figureCal(sogou_page)
+			vertical_feature_sogou = vertical_parser.verticalCal(sogou_page) + vertical_parser.figureCal(sogou_page) + vertical_parser.categoryCal(sogou_page)
 			vertical_feature_delta = self.Delta(vertical_feature_baidu,vertical_feature_sogou)  # calculating delta
 			#vertical_feature_delta = []
 			vertical_features.append(vertical_feature_baidu+vertical_feature_sogou+vertical_feature_delta)
@@ -111,8 +111,8 @@ if __name__ == "__main__":
 	baidu_parser = ParseBaidu()
 	sogou_parser = ParseSogou()
 
-	baidu_lists = baidu_parser.getResults(11,12,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Baidu/")
-	sogou_lists = sogou_parser.getResults(11,12,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
+	baidu_lists = baidu_parser.getResults(1,2,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Baidu/")
+	sogou_lists = sogou_parser.getResults(1,2,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Sogou/")
 
 	feature_calculator = Feature()
 	feature_calculator.featuresExtractor(baidu_lists,sogou_lists,"./query.txt")

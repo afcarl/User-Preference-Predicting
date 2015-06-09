@@ -65,6 +65,7 @@ def Judge_difference_vote(a1,a2,a3):#judege whether there exits stroing user pre
 			flag = 0
 		else:
 			flag = 1
+	#print str(a1) + "\t" + str(a2) + "\t" + str(a3) + "\t" + str(flag)
 	return flag 
 
 def Judge_left_right_vote(a1,a2,a3):#judege whether there exits stroing user preference & here we assumes that contradiction brings confusion
@@ -89,9 +90,9 @@ def Judge_left_right_vote(a1,a2,a3):#judege whether there exits stroing user pre
 			flag = 0
 		else:
 			flag = -1'''
-		if a1 == 0 and a2 == 0:
+		if a2 == 0 and a3 == 0:
 			flag = -1
-		elif a1 == 1 or a2 == 1:
+		elif a2 == 1 or a3 == 1:
 			flag = -1
 		else:
 			flag = 1
@@ -102,20 +103,52 @@ def Judge_left_right_vote(a1,a2,a3):#judege whether there exits stroing user pre
 			flag = 1
 		else:
 			flag = -1'''
-		if a1 == 0 and a2 == 0:
+		if a2 == 0 and a3 == 0:
 			flag = -1
-		elif a1 == -1 or a2 == -1:
+		elif a2 == -1 or a3 == -1:
 			flag = -1
 		else:
-			flag = 0		
+			flag = 0
+	#print str(a1) + "\t" + str(a2) + "\t" + str(a3) + "\t" + str(flag) 		
+	return flag 
+def Judge_left_right_vote_no_filter(a1,a2,a3):#judege whether there exits stroing user preference & here we assumes that contradiction brings confusion
+	flag = 0 
+	a1 = float(a1)
+	a2 = float(a2)
+	a3 = float(a3)
+	if a1 == 0:
+		if a2 == 0 or a3 == 0:
+			flag = -1
+		elif a2 == 1 and a3 == 1:
+			flag = 0
+		elif a2 == -1 and a3 == -1:
+			flag = 1
+		else:
+			flag = -1
+	elif a1 == -1:
+		if a2 == -1 or a3 == -1:
+			flag = 1
+		elif a2 == 1 and a3 == 1:
+			flag = 0
+		else:
+			flag = -1
+	else:
+		if a2 == 1 or a3 == 1:
+			flag = 0
+		elif a2 ==-1 and a3 == -1:
+			flag = 1
+		else:
+			flag = -1	
 	return flag 
 
-def ground_truth(file_path, prediction_type, judgement):#prediciton Path type with differnce? left_right?,judgement means how to calculate 0,1
+def ground_truth(file_path, prediction_type, judgement, top):#prediciton Path type with differnce? left_right?,judgement means how to calculate 0,1
 	y = []
 	result_lines = open(file_path,"r").readlines()
 	count = 0
 	for line in result_lines:
 		count += 1
+		if count > top:
+			break
 		#print line
 		[qid,a1,a2,a3] = line.replace("\n","").strip().split("\t")
 		if prediction_type == "difference" and judgement=="contradiction":
@@ -125,6 +158,8 @@ def ground_truth(file_path, prediction_type, judgement):#prediciton Path type wi
 			flag = Judge_difference_vote(Convert(a1),Convert(a2),Convert(a3))
 		elif prediction_type == "left_right" and judgement == "vote":
 			flag = Judge_left_right_vote(Convert(a1),Convert(a2),Convert(a3))
+		elif prediction_type == "left_right" and judgement == "vote_no_filter":
+			flag = Judge_left_right_vote_no_filter(Convert(a1),Convert(a2),Convert(a3))
 		y.append(flag)
 	return y
 
@@ -144,6 +179,7 @@ def clear_trainning_set(x,y):
 		del x[item]
 		del y[item]
 		count += 1
+	print "delete elements have " + str(count) + "\t" +str(len(delete_list))
 
 def get_features(file_path):
 	temp = []
@@ -169,15 +205,15 @@ def write2X(apsects):
 
 if __name__ == "__main__":
 
-	text_features = get_features("text_features.txt")
+	text_features = get_features("text_features_4.txt")
 	query_features = get_features("query_features.txt")
-	vertical_features = get_features("vertical_features.txt")
-	url_features = get_features("url_features.txt")
+	vertical_features = get_features("vertical_features_4.txt")
+	url_features = get_features("url_features_4.txt")
 
-	aspects = [vertical_features,text_features,url_features]
-	#aspects = [vertical_features]
-	#y = ground_truth("../Result/result.txt","difference","vote")
-	y = ground_truth("../Result/result.txt","left_right","vote")
+	aspects = [vertical_features,text_features]
+	#aspects = [url_features]
+	#y = ground_truth("../Result/result.txt","difference","vote",1000)
+	y = ground_truth("../Result/result.txt","left_right","vote",1000)
 	X = write2X(aspects)
 
 	clear_trainning_set(X,y)
@@ -185,8 +221,10 @@ if __name__ == "__main__":
 	y0 = 0
 	for i in range(len(y)):
 		if y[i] == 1:
+			#y[i] = 0
 			y1 += 1
 		else:
+			#y [i] =1 
 			y0 += 1
 
 	print "We got X for " + str(len(X)) +" and Y for " + str(len(y))
@@ -194,7 +232,7 @@ if __name__ == "__main__":
 	clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.01,max_depth=3,random_state=0)
 	#clf = svm.SVC(kernel='linear', C=1)
 	#clf = svm.SVC(C=1.0, kernel='rbf', degree=3, gamma=0.0, coef0=0.0, shrinking=True, probability=False, tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, random_state=None)
-	test = ['precision','recall','f1','roc_auc']
+	test = ['average_precision','recall','f1','roc_auc']
 	for item in test:
 		scores = cross_validation.cross_val_score(clf,X,y,cv=5,scoring=item)
 		#scores = clf.fit(x_train,y_train).score(x_test,y_test)

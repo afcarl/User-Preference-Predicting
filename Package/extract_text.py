@@ -17,6 +17,10 @@ class text:
 			query = query
 		q_l = len(query)
 		t_l = len(text)
+		
+		if q_l ==0 or t_l== 0:
+			return 0.5
+
 		count = 0
 		if q_l < t_l:
 			for char in query:

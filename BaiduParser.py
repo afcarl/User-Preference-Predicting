@@ -100,7 +100,6 @@ class SearchResult:
 
 	def output_category(self):
 		category_name = ["encyclopedia","download","video","stock","news","forum","experience","reading","gps_map"]
-		#category = [self.encyclopedia,self.download,self.video,self.stock,self.news,self.forum,self.experience,self.reading,self.gps_map]
 		for i in range(len(category_name)):
 			print category_name[i]+": "+str(eval(str("self.")+str(category_name[i])))+",",
 		print "\n"
@@ -213,10 +212,10 @@ class ParseBaidu:
 
 					if len(img)!=0:
 						figure = 1
-					try:
-						title = child.find_all("h3")[0]
-					except:
-						title = child.find_all("div",class_="op-soft-title")[0]	
+					#try:
+					title = child.find_all("h3")[0]
+					#except:
+					#	title = child.find_all("div",class_="op-soft-title")[0]	
 					# 
 					if not vertical:
 						snippet = 	child.find_all("div", class_ = "c-abstract")[0]
@@ -225,6 +224,11 @@ class ParseBaidu:
 						url = url.find_all("span",class_ = "g")[0]
 						url = clean_url(url.get_text())
 					else:
+						#try:
+						#	snippet = child.find_all("div", class_ ="c-border")[0]
+						#except:
+						#	snippet = child.find_all("div", class_ ="c-row")[0]
+						#snippet = snippet.get_text().strip().replace("\n","")[:140]
 						snippet = ""
 						url = child.find_all("span", class_= "c-showurl")[0].get_text()
 
@@ -237,7 +241,7 @@ class ParseBaidu:
 
 				except:
 					count = count - 1
-					#print "sth is wrong"
+					print "sth is wrong"
 					#traceback.print_exc()
 				if count > windows:
 					#print "Windows Ends"
@@ -247,8 +251,9 @@ class ParseBaidu:
 
 if __name__=='__main__':
 	p = ParseBaidu()
-	resultlist  = p.getResults(1,14,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Baidu/")
+	resultlist  = p.getResults(1,301,10,"../codes/Feature/Files/query_id.txt","../codes/Feature/Baidu/")
 	for result in resultlist:
 		for item in result:
 			item.Print()
+			print item.snippet
 			item.output_category()
