@@ -196,7 +196,7 @@ class ParseBaidu:
 			count = 0
 			Results = []
 			flag = 0
-			print query
+			print "Baidu\t" + query
 
 			for child in container_l.children:
 				figure = 0
@@ -241,7 +241,7 @@ class ParseBaidu:
 
 				except:
 					count = count - 1
-					print "sth is wrong"
+					#print "sth is wrong"
 					#traceback.print_exc()
 				if count > windows:
 					#print "Windows Ends"

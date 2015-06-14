@@ -18,7 +18,7 @@ class url:
 		l_baidu = len(baidu)
 		l_sogou = len(sogou)
 		if l_baidu==0 or l_sogou==0:
-			return 0 
+			return 0
 		for i in range(l_baidu):
 			for j in range(l_sogou):
 				flag = self.urlSimilar(self.cleanurl(baidu[i].url),self.cleanurl(sogou[j].url))
@@ -36,7 +36,7 @@ class url:
 		l_baidu = len(baidu)
 		l_sogou = len(sogou)
 		if l_baidu==0 or l_sogou==0:
-			return 0 
+			return 0
 		similar_list = []
 		for i in range(l_baidu):
 			for j in range(l_sogou):
