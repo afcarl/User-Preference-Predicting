@@ -19,8 +19,8 @@ if __name__ == "__main__":
 
 	baidu_parser = ParseBaidu()
 	sogou_parser = ParseSogou()
-	baidu_lists = baidu_parser.getResults(1,1001,5,"../Sogou_Baidu_Crawler/Files/query_id.txt","../Sogou_Baidu_Crawler/Baidu/")
-	sogou_lists = sogou_parser.getResults(1,1001,5,"../Sogou_Baidu_Crawler/Files/query_id.txt","../Sogou_Baidu_Crawler/Sogou/")
+	baidu_lists = baidu_parser.getResults(1,1001,9,"../Sogou_Baidu_Crawler/Files/query_id.txt","../Sogou_Baidu_Crawler/Baidu/")
+	sogou_lists = sogou_parser.getResults(1,1001,9,"../Sogou_Baidu_Crawler/Files/query_id.txt","../Sogou_Baidu_Crawler/Sogou/")
 
 	feature_calculator = Feature()
 	feature_calculator.featuresExtractor(baidu_lists,sogou_lists,"./query.txt")

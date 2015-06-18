@@ -1,7 +1,7 @@
 import re
 #coding = utf8
-#read_file_list = ["result4.csv","result5.csv","result6.csv","result7.csv","result8.csv","result9.csv","result10.csv
-read_file_list = ["result7-1.csv","result7-2.csv","result7-3.csv"]
+read_file_list = ["result1.csv","result2.csv","result3.csv","result4.csv","result5.csv","result6.csv","result7.csv","result8.csv","result9.csv","result10.csv"]
+#read_file_list = ["result1.csv",]
 re_data = re.compile(r'(?<=unit_data:).+?(?=,unit_golden)')
 re_result = re.compile(r'(?<=result:).+?(?=,correct)')
 data_description = re.compile(r'(?<=question_description:).+?(?=,timestamp)')

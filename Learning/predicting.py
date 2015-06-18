@@ -144,6 +144,7 @@ def Judge_left_right_vote_no_filter(a1,a2,a3):#judege whether there exits stroin
 			flag = 1
 		else:
 			flag = -1	
+	#print str(a1) + "\t" + str(a2) + "\t" + str(a3) + "\t" + str(flag)
 	return flag 
 
 def ground_truth(file_path, prediction_type, judgement, top):#prediciton Path type with differnce? left_right?,judgement means how to calculate 0,1
@@ -187,6 +188,25 @@ def clear_trainning_set(x,y):
 		count += 1
 	print "delete elements have " + str(count) + "\t" +str(len(delete_list))
 
+def balance_trainning_set(x,y):
+	delete_list = []
+	l_x = len(x)
+	l_y = len(y)
+	if l_x!=l_y:
+		print("Error in Tranning set, break!")
+	else:
+		for i in range(l_y):
+			if y[i]== 1 :  #judge as non-relevant
+				if i%2==0:
+					delete_list.append(i)
+	count = 0
+	for item in delete_list:
+		item = item - count
+		del x[item]
+		del y[item]
+		count += 1
+	print "delete elements have " + str(count) + "\t" +str(len(delete_list))
+
 def get_features(file_path):
 	temp = []
 	lines = open(file_path,"r").readlines()
@@ -195,9 +215,9 @@ def get_features(file_path):
 		temp.append(features)
 	return temp
 
-def write2X(apsects):
+def write2X(aspects):
 	X = []
-	length = len(aspects[0])
+	length = len(aspects[0]) ## How many instances 
 	for item in aspects:
 		if len(item)!=length:
 			print "error! features length don't match! "
@@ -211,18 +231,34 @@ def write2X(apsects):
 
 if __name__ == "__main__":
 
+	text_features_5 = get_features("text_features_5.txt")
 	text_features = get_features("text_features.txt")
+	#print len(text_features[0])
 	query_features = get_features("query_features.txt")
+
+	vertical_features_5 = get_features("vertical_features_5.txt")
 	vertical_features = get_features("vertical_features.txt")
+
+	#position_features = 
+
+	url_features_5 = get_features("url_features_5.txt")
 	url_features = get_features("url_features.txt")
 
-	aspects = [vertical_features,text_features]
-	#aspects = [url_features]
-	#y = ground_truth("../Result/result.txt","difference","vote",1000)
-	y = ground_truth("../Result/result.txt","left_right","vote",1000)
-	X = write2X(aspects)[:1000]
+	
+	
 
+	position_features_sogou = get_features("Sogou_position.txt")
+	position_features_baidu = get_features ("Baidu_position.txt")
+
+	aspects_1 = [query_features,text_features_5,url_features_5]
+	aspects_2 = [vertical_features_5]
+	#aspects = [url_features]
+	#y = ground_truth("../Result/result.txt","difference","contradiction",1000)
+	y = ground_truth("../Result/result.txt","left_right","vote",1000)
+	X = write2X(aspects_1)[:1000]
 	clear_trainning_set(X,y)
+	#clear_trainning_set(X2,y2)
+	#balance_trainning_set(X,y)
 	y1 = 0 
 	y0 = 0
 	for i in range(len(y)):
@@ -233,20 +269,22 @@ if __name__ == "__main__":
 
 	print "We got X for " + str(len(X)) +" and Y for " + str(len(y))
 	print "we have " + str(y1) + "for 1 and " + str(y0) + " for 0" 
-	clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.01,max_depth=3,random_state=0)
-	#clf = svm.SVC(C=1.0, kernel='rbf', degree=3, gamma=0.0, coef0=0.0, shrinking=True, probability=False, tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, random_state=None)
+	clf = GradientBoostingClassifier(n_estimators=47, learning_rate=0.03,max_depth=3,random_state=0)
+	test_X = clf.fit_transform(X,y)
+	importances  = clf.feature_importances_
+	indices = np.argsort(importances)[::-1]
+	for f in range(10):
+		print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+	
+	print len(test_X[0])
+	#clf2 = svm.SVC(C=1.0, kernel='rbf', degree=3, gamma=0.0, coef0=0.0, shrinking=True, probability=False, tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, random_state=None)
 	test = ['accuracy','recall_macro','f1_macro','roc_auc']
+	#test =  ['accuracy','f1_macro']
+	clf2 = GradientBoostingClassifier(n_estimators=47, learning_rate=0.03,max_depth=3,random_state=0)
 	for item in test:
-		scores = cross_validation.cross_val_score(clf,X,y,cv=5,scoring=item)
+		scores = cross_validation.cross_val_score(clf2,X,y,cv=5,scoring=item)
 		print(item+" score is "+str(sum(scores)/5))
-		#print scores 
-	#clf.fit(X[:800],y[:800])
-	#X_ = X[200:300]
-	#print clf.predict_proba(X_)
 
-
-
-'''
 	print "Majority Voting"
 	if y1 > y0:
 		y_major = [ 1 for i in range(len(y)) ]
@@ -261,31 +299,20 @@ if __name__ == "__main__":
 	print "f1_macro score is " + str(score)
 	print "roc_auc score is " + str(roc_auc_score(y, y_major))
 '''
-'''
-	x_train, x_test, y_train, y_test = cross_validation.train_test_split(X,y,test_size=0.2, random_state=0)
-	print y_test
-	clf.fit(x_train,y_train)
-	y_predicted = clf.predict(x_test)
+	#transformX = clf.fit_transform(X[:size_X*4/5],y[:size_X*4/5])
+	#newx = clf.transform((X,threshold=0.01),y)
+	#print len(transformX[0])
 	
-	# precicision:
+	#print clf.score(test_X,y)
+		
+	
 
-	cm = confusion_matrix(y_test, y_predicted)
-	print cm
-	tn = cm[0][0]
-	fp = cm[0][1]
-	tp = cm[1][1]
-	fn = cm[1][0]
-	print str(tn) + "\t" + str(fp) + "\t" + str(fn) + "\t" + str(tp)
-	print float((cm[0][0] + cm[1][1]))/float(len(y_test))
-
-	#p1 = 
-
-
-	recall = float(tp)/float(tp+fn)
-	print recall
-	f1 = 2/(1/precision+1/recall)
-	print f1
-# write it by yourself and calculate precision, recall, f1 and kappa
-# five fold 
-# significant test
+	#clf2 = GradientBoostingClassifier(n_estimators=i, learning_rate=0.03,max_depth=3,random_state=0)
+		#for item in test:
+		#accuracy2 = sum(cross_validation.cross_val_score(clf2,X2,y2,cv=5,scoring="accuracy"))
+		#f1_macro2 = sum(cross_validation.cross_val_score(clf2,X2,y2,cv=5,scoring="f1_macro"))
+			#scores  = cross_validation.cross_val_score(clf2,X2,y2,cv=5,scoring=item)
+			#print(item+" score is "+ str(sum(scores)/5))
+		#if accuracy>accuracy2 and f1_macro>f1_macro2:
+		#print str(i) + " !!!! " + str(accuracy/5) + "\t" + str(f1_macro/5) + "\t" + str(accuracy2/5) + "\t" + str(f1_macro2/5)  
 '''
