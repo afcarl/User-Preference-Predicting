@@ -1,6 +1,7 @@
 # User Preference Predicting 
 
 ## 文件分为三个部分：Parser, Extract, Predictor
+## 另外新加入的压缩包SERPs for S&B.zip是 query,页面，标注结果和文档说明
 
 ###Parser 
 
