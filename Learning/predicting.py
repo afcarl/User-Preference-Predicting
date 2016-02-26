@@ -289,10 +289,10 @@ if __name__ == "__main__":
 	test = ['accuracy','recall_macro','f1_macro','roc_auc']
 	#test =  ['accuracy','f1_macro']
 	clf2 = GradientBoostingClassifier(n_estimators=47, learning_rate=0.03,max_depth=3,random_state=0)
-	#for item in test:
-	#	scores = cross_validation.cross_val_score(clf2,X,y,cv=5,scoring=item)
-	#	print(item+" score is "+str(sum(scores)/5))
-	gap = 77
+	for item in test:
+		scores = cross_validation.cross_val_score(clf2,X,y,cv=5,scoring=item)
+		print(item+" score is "+str(sum(scores)/5))
+	gap = 79
 	start_ = 0
 	end_ = len(X)
 	y_predict = {}
@@ -333,13 +333,14 @@ if __name__ == "__main__":
 	right_dict = {}
 	for i in range(end_):
 		key = sorted_prob_list[i][0]
-		print str(key) + "\t" + str(y_predict[key]) + "\t" + str(y[key])
+		#print str(key) + "\t" + str(y_predict[key]) + "\t" + str(y[key])
 		if y_predict[key] == y[key]:
 			count_right+=1 
 		right_dict[i+1] = count_right
-	test_point = [ i*38 for i in range(1,11)]
+	test_point = [ i*38 for i in range(1,10)]
+	test_point.append(383)
 	for item in test_point:
-		print float(right_dict[item])/float(item)
+		print str(float(right_dict[item])/float(item)) + "\t" + str(right_dict[item]) + "\t" + str(item)
 
 
 
